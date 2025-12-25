@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Analysis Result</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      line-height: 1.4;
+      background: linear-gradient(135deg, #0f0f0f 0%, #2d2d2d 100%);
+      color: #e0e0e0;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 50%;
+      animation: rise 15s infinite ease-in;
+      backdrop-filter: blur(5px);
+    }
+
+    @keyframes rise {
+      0% {
+        bottom: -100px;
+        transform: translateX(0) scale(1);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 1;
+      }
+
+      90% {
+        opacity: 1;
+      }
+
+      100% {
+        bottom: 110vh;
+        transform: translateX(100px) scale(0.5);
+        opacity: 0;
+      }
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 30px;
+      background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    h2 {
+      font-size: 1.8em;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      color: #fff;
+      border-bottom: 2px solid #333;
+      padding-bottom: 10px;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    pre {
+      background: #1a1a1a;
+      padding: 15px;
+      border-radius: 8px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      border: 1px solid #333;
+      color: #b0b0b0;
+      font-family: 'Courier New', monospace;
+      line-height: 1.5;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    .verdict {
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      animation: slideIn 0.6s ease-out;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .phish {
+      background: rgba(40, 0, 0, 0.6);
+      border: 2px solid #ff4444;
+      color: #ffcccc;
+    }
+
+    .safe {
+      background: rgba(0, 40, 0, 0.6);
+      border: 2px solid #44ff44;
+      color: #ccffcc;
+    }
+
+    .verdict strong {
+      font-size: 1.1em;
+    }
+
+    .verdict ul {
+      margin-top: 10px;
+      margin-left: 20px;
+    }
+
+    .verdict li {
+      margin: 5px 0;
+    }
+
+    code {
+      background: #2a2a2a;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      color: #e0e0e0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid #333;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #333;
+      text-align: left;
+    }
+
+    th {
+      background: #252525;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: #222;
+    }
+
+    ul {
+      margin-top: 10px;
+    }
+
+    ul li {
+      margin: 8px 0;
+      padding: 10px;
+      background: #1a1a1a;
+      border-radius: 6px;
+      border-left: 3px solid #444;
+      transition: all 0.3s ease;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    ul li:hover {
+      background: #222;
+      border-left-color: #666;
+      transform: translateX(3px);
+    }
+
+    ul li strong {
+      color: #fff;
+    }
+
+    details {
+      margin-top: 10px;
+      background: #1a1a1a;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #333;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #fff;
+      transition: color 0.3s ease;
+    }
+
+    summary:hover {
+      color: #ccc;
+    }
+
+    .muted {
+      color: #888;
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+
+    a {
+      color: #6a9cff;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #8fb4ff;
+      text-decoration: underline;
+    }
+
+    a.small {
+      font-size: 0.95em;
+    }
+
+    p {
+      margin: 15px 0;
+    }
+
+    p a {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #2a2a2a;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    p a:hover {
+      background: #333;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+    }
+
+    p.muted {
+      padding: 12px;
+      background: rgba(255, 193, 7, 0.1);
+      border-left: 3px solid #ffc107;
+      border-radius: 6px;
+      color: #ffdb4d;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 2em;
+      }
+
+      h2 {
+        font-size: 1.5em;
+      }
+
+      .verdict {
+        padding: 12px;
+      }
+
+      pre {
+        padding: 12px;
+        font-size: 0.85em;
+      }
+
+      .vt-danger {
+        color: #ff6b6b;
+      }
+
+      .vt-success {
+        color: #44ff44;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-animation" id="bgAnimation"></div>
+
+  <div class="content-wrapper">
+    <h1>Analysis Result</h1>
+    {% if analysis %}
+    <div class="verdict {% if analysis.verdict == 'phishing' %}phish{% else %}safe{% endif %}">
+      <strong>Verdict:</strong>
+      {% if analysis.verdict == 'phishing' %}
+      <span style="font-weight:700">PHISHING</span>
+      {% else %}
+      <span style="font-weight:700">NOT PHISHING</span>
+      {% endif %}
+      — Score: <code>{{ analysis.score }}</code>
+      <div style="margin-top:8px">
+        <em>Reasons:</em>
+        {% if analysis.reasons %}
+        <ul>
+          {% for r in analysis.reasons %}
+          <li>{{ r }}</li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <span class="muted">No specific heuristic reasons flagged.</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <h2>Headers</h2>
+    <pre>{{ headers | tojson(indent=2) }}</pre>
+
+    <h2>Links found</h2>
+    {% if links %}
+    <ul>
+      {% for l in links %}
+      <li>
+        <strong>{{ l.domain or l.url }}</strong> —
+        {% if l.error %}
+        <span class="vt-danger">Error: {{ l.error }}</span>
+        {% else %}
+        Status: {{ l.status }}
+        {% if l.final_url and l.final_url != l.url %} — redirects to <a class="small" href="{{ l.final_url }}"
+          target="_blank" rel="noreferrer noopener">{{ l.final_url }}</a>{% endif %}
+        {% endif %}
+        <div class="muted">{{ l.url }}</div>
+        {% if l.vt %}
+        <div class="vt-report" style="margin-top:5px; font-size: 0.9em; color: #aaa;">
+          <strong>VirusTotal:</strong>
+          {% if l.vt.error %}
+          <span class="vt-danger">{{ l.vt.error }}</span>
+          {% elif l.vt.status %}
+          <span>{{ l.vt.status }}</span>
+          {% else %}
+          <span class="{% if l.vt.malicious > 0 %}vt-danger{% else %}vt-success{% endif %}">
+            {{ l.vt.malicious }} malicious, {{ l.vt.suspicious }} suspicious
+          </span>
+          — <a href="{{ l.vt.link }}" target="_blank" class="small">View on VT</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No links found in the email body.</p>
+    {% endif %}
+
+    <h2>Attachments</h2>
+    {% if attachments %}
+    <ul>
+      {% for a in attachments %}
+      <li>
+        <strong>{{ a.filename }}</strong> — {{ a.content_type }} — {{ a.size or 'n/a' }} bytes
+        <div>sha256: <code>{{ a.sha256 or 'n/a' }}</code></div>
+        {% if a.saved_path %}<div>Saved: {{ a.saved_path }}</div>{% endif %}
+        {% if a.pdf_pages %}<div>PDF pages: {{ a.pdf_pages }}</div>{% endif %}
+        {% if a.image_size %}<div>Image size: {{ a.image_size }}</div>{% endif %}
+        {% if a.pdf_error or a.image_error or a.saved_error %}<div class="vt-danger">Errors: {{ a.pdf_error }} {{
+          a.image_error }} {{ a.saved_error }}</div>{% endif %}
+        {% if a.reason %}<div class="muted">Note: {{ a.reason }}</div>{% endif %}
+        {% if a.vt %}
+        <div class="vt-report" style="margin-top:5px; font-size: 0.9em; color: #aaa;">
+          <strong>VirusTotal:</strong>
+          {% if a.vt.error %}
+          <span class="vt-danger">{{ a.vt.error }}</span>
+          {% elif a.vt.status %}
+          <span>{{ a.vt.status }}</span>
+          {% else %}
+          <span class="{% if a.vt.malicious > 0 %}vt-danger{% else %}vt-success{% endif %}">
+            {{ a.vt.malicious }} malicious, {{ a.vt.suspicious }} suspicious
+          </span>
+          — <a href="{{ a.vt.link }}" target="_blank" class="small">View on VT</a>
+          {% endif %}
+        </div>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="muted">No attachments found.</p>
+    {% endif %}
+
+    <h2>Raw body (text)</h2>
+    <pre>{{ raw_body }}</pre>
+
+    <p><a href="{{ url_for('index') }}">Analyze another email</a></p>
+    <p class="muted">Disclaimer: This is a heuristic check — treat positive results as suspicious and investigate
+      manually.</p>
+  </div>
+
+  <script>
+    function createBubbles() {
+      const bgAnimation = document.getElementById('bgAnimation');
+      const bubbleCount = 12;
+
+      for (let i = 0; i < bubbleCount; i++) {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+
+        const size = Math.random() * 100 + 50;
+        bubble.style.width = size + 'px';
+        bubble.style.height = size + 'px';
+        bubble.style.left = Math.random() * 100 + '%';
+        bubble.style.animationDelay = Math.random() * 10 + 's';
+        bubble.style.animationDuration = (Math.random() * 10 + 10) + 's';
+
+        bgAnimation.appendChild(bubble);
+      }
+    }
+    createBubbles();
+  </script>
+</body>
+
+</html>
