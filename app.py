@@ -12,7 +12,11 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "change-me")
-UPLOAD_DIR = os.path.join(os.getcwd(), "uploads")
+if os.environ.get("VERCEL"):
+    UPLOAD_DIR = "/tmp/uploads"
+else:
+    UPLOAD_DIR = os.path.join(os.getcwd(), "uploads")
+
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 def safe_check_links(links):
     results = []
